@@ -53,22 +53,22 @@
     position: relative; height: calc(var(--block-h) * 0.78); aspect-ratio: 9 / 19.5;  /* real iPhone proportions */
     border: 0.7rem solid #08090c; border-radius: 2.6rem; overflow: hidden;
     background: #08090c; box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.45);
-    container-type: inline-size;   /* overlay text scales with the phone size */
+    container-type: inline-size;   /* bar text scales with the phone size */
+    display: flex; flex-direction: column;   /* top bar, video, bottom bar */
   }
   .phone::before {   /* notch */
     content: ""; position: absolute; top: 0.55rem; left: 50%; transform: translateX(-50%);
     width: 28%; height: 1.1rem; border-radius: 1rem; background: #08090c; z-index: 3;
   }
 
-  /* Simplified social media overlay: tabs at the top, caption + nav bar at the bottom */
-  .ui-top, .ui-bottom { position: absolute; left: 0; right: 0; z-index: 2; color: #fff; pointer-events: none; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); }
-  .ui-top { top: 0; padding-top: 2rem; padding-top: 9cqw; display: flex; justify-content: center; gap: 5cqw; font-size: 0.7rem; font-size: 4.2cqw; font-weight: 600; color: rgba(255, 255, 255, 0.65); }
+  /* The video keeps its exact 9:16 shape (no cropping); the bars fill the rest of the screen */
+  .phone video { flex: none; width: 100%; height: auto; aspect-ratio: 9 / 16; }
+  .ui-top, .ui-nav { position: relative; z-index: 2; background: #0d0e12; color: #fff; font-weight: 600; }
+  .ui-top { flex: 1; display: flex; align-items: flex-end; justify-content: center; gap: 5cqw; padding-bottom: 2.5cqw; font-size: 0.7rem; font-size: 4.2cqw; color: rgba(255, 255, 255, 0.6); }
   .ui-top .on { color: #fff; border-bottom: 0.4cqw solid #fff; padding-bottom: 0.8cqw; }
-  .ui-bottom { bottom: 0; background: linear-gradient(transparent, rgba(0, 0, 0, 0.55) 55%); padding-top: 10cqw; font-size: 0.65rem; font-size: 3.4cqw; }
-  .ui-bottom .cap { display: flex; flex-direction: column; gap: 1cqw; padding: 0 4cqw 3cqw; }
-  .ui-bottom .cap b { font-size: 4cqw; }
-  .ui-bottom nav { display: flex; justify-content: space-between; align-items: center; padding: 3cqw 5cqw 6cqw; background: rgba(0, 0, 0, 0.72); font-weight: 600; text-shadow: none; }
-  .ui-bottom .plus { width: 10cqw; height: 6.6cqw; border-radius: 1.8cqw; background: #fff; box-shadow: -0.9cqw 0 #25f4ee, 0.9cqw 0 #fe2c55; }
+  .ui-nav { flex: 1.3; display: flex; justify-content: space-between; align-items: flex-start; padding: 3cqw 5cqw; font-size: 0.65rem; font-size: 3.4cqw; }
+  .ui-nav::after { content: ""; position: absolute; bottom: 2.5cqw; left: 50%; transform: translateX(-50%); width: 34%; height: 1.1cqw; border-radius: 1cqw; background: rgba(255, 255, 255, 0.85); }  /* home indicator */
+  .ui-nav .plus { width: 10cqw; height: 6.6cqw; border-radius: 1.8cqw; background: #fff; box-shadow: -0.9cqw 0 #25f4ee, 0.9cqw 0 #fe2c55; }
 
   /* Block type: photo collage (6 x 6 grid, no gaps) */
   .collage { height: var(--collage-h); display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(6, 1fr); }
@@ -102,17 +102,20 @@
 
   <!-- 3. Three phones block -->
   <section class="block phones">
-    <div class="phone"><video muted loop playsinline preload="metadata" src="videos/content/b3-1.mp4"></video>
+    <div class="phone">
       <div class="ui-top"><span>Following</span><span class="on">For You</span></div>
-      <div class="ui-bottom"><div class="cap"><b>@yourname</b><span>Short caption goes here #hashtag</span></div><nav><span>Home</span><span>Friends</span><span class="plus"></span><span>Inbox</span><span>Me</span></nav></div>
+      <video muted loop playsinline preload="metadata" src="videos/content/b3-1.mp4"></video>
+      <nav class="ui-nav"><span>Home</span><span>Friends</span><span class="plus"></span><span>Inbox</span><span>Me</span></nav>
     </div>
-    <div class="phone"><video muted loop playsinline preload="metadata" src="videos/content/b3-2.mp4"></video>
+    <div class="phone">
       <div class="ui-top"><span>Following</span><span class="on">For You</span></div>
-      <div class="ui-bottom"><div class="cap"><b>@yourname</b><span>Short caption goes here #hashtag</span></div><nav><span>Home</span><span>Friends</span><span class="plus"></span><span>Inbox</span><span>Me</span></nav></div>
+      <video muted loop playsinline preload="metadata" src="videos/content/b3-2.mp4"></video>
+      <nav class="ui-nav"><span>Home</span><span>Friends</span><span class="plus"></span><span>Inbox</span><span>Me</span></nav>
     </div>
-    <div class="phone"><video muted loop playsinline preload="metadata" src="videos/content/b3-3.mp4"></video>
+    <div class="phone">
       <div class="ui-top"><span>Following</span><span class="on">For You</span></div>
-      <div class="ui-bottom"><div class="cap"><b>@yourname</b><span>Short caption goes here #hashtag</span></div><nav><span>Home</span><span>Friends</span><span class="plus"></span><span>Inbox</span><span>Me</span></nav></div>
+      <video muted loop playsinline preload="metadata" src="videos/content/b3-3.mp4"></video>
+      <nav class="ui-nav"><span>Home</span><span>Friends</span><span class="plus"></span><span>Inbox</span><span>Me</span></nav>
     </div>
   </section>
 
