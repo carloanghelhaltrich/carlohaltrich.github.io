@@ -11,6 +11,7 @@
     --collage-h: 170vh;       /* height of the photo collage block */
     --phones-bg: #1d2333;     /* background of the phone block */
     --phone-gap: 4vw;         /* space between the phones */
+    --video-dim: 0.2;         /* video dimming: 0 = none, higher = darker (same as the landing page) */
   }
   /* ------------------------------------------ */
 
@@ -20,6 +21,13 @@
 
   .block { position: relative; display: block; width: 100%; height: var(--block-h); overflow: hidden; background: #1a1a1a; }
   video, .collage img { display: block; width: 100%; height: 100%; object-fit: cover; background: #1a1a1a; }
+
+  /* Dimming layer over every video (same method as the landing page) */
+  .split > div, .slide, .phone { position: relative; }
+  .split > div::after, .slide::after, .phone::after, .single::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: rgba(0, 0, 0, var(--video-dim));
+  }
 
   /* Block type: split (two videos side by side) */
   .split { display: flex; }
@@ -100,7 +108,7 @@
   </section>
 
   <!-- 5. Single video block -->
-  <section class="block">
+  <section class="block single">
     <video muted loop playsinline preload="metadata" src="videos/content/b5.mp4"></video>
   </section>
 
@@ -116,7 +124,7 @@
   </section>
 
   <!-- 7. Single video block -->
-  <section class="block">
+  <section class="block single">
     <video muted loop playsinline preload="metadata" src="videos/content/b7.mp4"></video>
   </section>
 
