@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Content</title>
+<style>
+  /* ---------- SETTINGS: edit these ---------- */
+  :root {
+    --block-h: 85vh;          /* height of every block; under 100vh so neighbours peek in */
+    --collage-h: 170vh;       /* height of the photo collage block */
+    --phones-bg: #1d2333;     /* background of the phone block */
+    --phone-gap: 4vw;         /* space between the phones */
+  }
+  /* ------------------------------------------ */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #111; }
+  body { background: #111; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+  .block { position: relative; display: block; width: 100%; height: var(--block-h); overflow: hidden; background: #1a1a1a; }
+  video, .collage img { display: block; width: 100%; height: 100%; object-fit: cover; background: #1a1a1a; }
+
+  /* Block type: split (two videos side by side) */
+  .split { display: flex; }
+  .split > div { flex: 1 1 50%; height: 100%; }
+
+  /* Block type: slideshow */
+  .track { display: flex; height: 100%; transition: transform 0.5s ease; }
+  .slide { flex: 0 0 100%; height: 100%; }
+  .arrow {
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+    width: 3.25rem; height: 3.25rem; border-radius: 50%;
+    border: 2px solid #fff; background: rgba(0, 0, 0, 0.35); color: #fff;
+    font-size: 1.75rem; line-height: 1; cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .arrow:hover, .arrow:focus-visible { background: #fff; color: #111; outline: none; }
+  .arrow.prev { left: 1.5rem; }
+  .arrow.next { right: 1.5rem; }
+
+  /* Block type: three phones */
+  .phones { display: flex; align-items: center; justify-content: center; gap: var(--phone-gap); background: var(--phones-bg); }
+  .phone {
+    position: relative; height: 78%; aspect-ratio: 9 / 19.5;
+    border: 0.7rem solid #08090c; border-radius: 2.6rem; overflow: hidden;
+    background: #08090c; box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.45);
+  }
+  .phone::before {   /* notch */
+    content: ""; position: absolute; top: 0.55rem; left: 50%; transform: translateX(-50%);
+    width: 28%; height: 1.1rem; border-radius: 1rem; background: #08090c; z-index: 1;
+  }
+
+  /* Block type: photo collage (6 x 6 grid, no gaps) */
+  .collage { height: var(--collage-h); display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(6, 1fr); }
+  .collage img:nth-child(1) { grid-area: 1 / 1 / 4 / 4; }
+  .collage img:nth-child(2) { grid-area: 1 / 4 / 3 / 7; }
+  .collage img:nth-child(3) { grid-area: 3 / 4 / 5 / 6; }
+  .collage img:nth-child(4) { grid-area: 3 / 6 / 7 / 7; }
+  .collage img:nth-child(5) { grid-area: 4 / 1 / 7 / 3; }
+  .collage img:nth-child(6) { grid-area: 4 / 3 / 7 / 4; }
+  .collage img:nth-child(7) { grid-area: 5 / 4 / 7 / 6; }
+</style>
+</head>
+<body>
+
+  <!-- 1. Split block -->
+  <section class="block split">
+    <div><video muted loop playsinline preload="metadata" src="videos/content/b1-left.mp4"></video></div>
+    <div><video muted loop playsinline preload="metadata" src="videos/content/b1-right.mp4"></video></div>
+  </section>
+
+  <!-- 2. Slideshow block (add or remove .slide divs freely) -->
+  <section class="block slider">
+    <div class="track">
+      <div class="slide"><video muted loop playsinline preload="metadata" src="videos/content/b2-1.mp4"></video></div>
+      <div class="slide"><video muted loop playsinline preload="metadata" src="videos/content/b2-2.mp4"></video></div>
+      <div class="slide"><video muted loop playsinline preload="metadata" src="videos/content/b2-3.mp4"></video></div>
+    </div>
+    <button class="arrow prev" aria-label="Previous">&#8249;</button>
+    <button class="arrow next" aria-label="Next">&#8250;</button>
+  </section>
+
+  <!-- 3. Three phones block -->
+  <section class="block phones">
+    <div class="phone"><video muted loop playsinline preload="metadata" src="videos/content/b3-1.mp4"></video></div>
+    <div class="phone"><video muted loop playsinline preload="metadata" src="videos/content/b3-2.mp4"></video></div>
+    <div class="phone"><video muted loop playsinline preload="metadata" src="videos/content/b3-3.mp4"></video></div>
+  </section>
+
+  <!-- 4. Slideshow block -->
+  <section class="block slider">
+    <div class="track">
+      <div class="slide"><video muted loop playsinline preload="metadata" src="videos/content/b4-1.mp4"></video></div>
+      <div class="slide"><video muted loop playsinline preload="metadata" src="videos/content/b4-2.mp4"></video></div>
+      <div class="slide"><video muted loop playsinline preload="metadata" src="videos/content/b4-3.mp4"></video></div>
+    </div>
+    <button class="arrow prev" aria-label="Previous">&#8249;</button>
+    <button class="arrow next" aria-label="Next">&#8250;</button>
+  </section>
+
+  <!-- 5. Single video block -->
+  <section class="block">
+    <video muted loop playsinline preload="metadata" src="videos/content/b5.mp4"></video>
+  </section>
+
+  <!-- 6. Photo collage block (7 photos, fills the grid exactly) -->
+  <section class="block collage">
+    <img src="photos/p1.jpg" alt="">
+    <img src="photos/p2.jpg" alt="">
+    <img src="photos/p3.jpg" alt="">
+    <img src="photos/p4.jpg" alt="">
+    <img src="photos/p5.jpg" alt="">
+    <img src="photos/p6.jpg" alt="">
+    <img src="photos/p7.jpg" alt="">
+  </section>
+
+  <!-- 7. Single video block -->
+  <section class="block">
+    <video muted loop playsinline preload="metadata" src="videos/content/b7.mp4"></video>
+  </section>
+
+  <script src="site.js"></script>
+  <script>
+    const videos = document.querySelectorAll('video');
+
+    // A video plays only while on screen (and, in a slideshow, only when its slide is showing)
+    function update(v) {
+      const slide = v.closest('.slide');
+      const ok = v.dataset.vis === '1' && (!slide || slide.classList.contains('active'));
+      if (ok) { v.muted = true; const p = v.play(); if (p && p.catch) p.catch(() => {}); }
+      else v.pause();
+    }
+
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { e.target.dataset.vis = e.isIntersecting ? '1' : '0'; update(e.target); });
+    }, { threshold: 0.3 });
+    videos.forEach(v => { v.muted = true; io.observe(v); });
+
+    // Slideshows
+    document.querySelectorAll('.slider').forEach(s => {
+      const track = s.querySelector('.track');
+      const slides = [...s.querySelectorAll('.slide')];
+      let i = 0;
+      function show(n) {
+        i = (n + slides.length) % slides.length;
+        slides.forEach((el, k) => el.classList.toggle('active', k === i));
+        track.style.transform = 'translateX(' + (-100 * i) + '%)';
+        slides.forEach(el => update(el.querySelector('video')));
+      }
+      s.querySelector('.prev').addEventListener('click', () => show(i - 1));
+      s.querySelector('.next').addEventListener('click', () => show(i + 1));
+      show(0);
+    });
+
+    // If a browser (e.g. Safari) blocks autoplay, the first click or key press starts everything
+    ['pointerdown', 'keydown', 'touchstart'].forEach(evt =>
+      document.addEventListener(evt, () => videos.forEach(update), { once: true, passive: true })
+    );
+  </script>
+</body>
+</html>
