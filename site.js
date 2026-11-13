@@ -1,5 +1,5 @@
 /* ---------- SETTINGS: edit these ---------- */
-const SITE_TITLE = "Your Name";        // <-- the title shown top left on every page
+const SITE_TITLE = "carlo haltrich";        // <-- the title shown top left on every page
 const HOME_LINK  = "index.html";        // where clicking the title goes
 const TITLE_COLOR = "#ffffff";
 const TITLE_SIZE  = "1.5rem";
