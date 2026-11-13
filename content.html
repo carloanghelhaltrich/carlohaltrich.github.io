@@ -61,14 +61,23 @@
     width: 28%; height: 1.1rem; border-radius: 1rem; background: #08090c; z-index: 3;
   }
 
-  /* The video keeps its exact 9:16 shape (no cropping); the bars fill the rest of the screen */
+  /* TikTok-style proportions: top bar ~8% and bottom bar ~10% of the screen, video exactly 9:16 in between */
   .phone video { flex: none; width: 100%; height: auto; aspect-ratio: 9 / 16; }
   .ui-top, .ui-nav { position: relative; z-index: 2; background: #0d0e12; color: #fff; font-weight: 600; }
-  .ui-top { flex: 1; display: flex; align-items: flex-end; justify-content: center; gap: 5cqw; padding-bottom: 2.5cqw; font-size: 0.7rem; font-size: 4.2cqw; color: rgba(255, 255, 255, 0.6); }
-  .ui-top .on { color: #fff; border-bottom: 0.4cqw solid #fff; padding-bottom: 0.8cqw; }
-  .ui-nav { flex: 1.3; display: flex; justify-content: space-between; align-items: flex-start; padding: 3cqw 5cqw; font-size: 0.65rem; font-size: 3.4cqw; }
-  .ui-nav::after { content: ""; position: absolute; bottom: 2.5cqw; left: 50%; transform: translateX(-50%); width: 34%; height: 1.1cqw; border-radius: 1cqw; background: rgba(255, 255, 255, 0.85); }  /* home indicator */
-  .ui-nav .plus { width: 10cqw; height: 6.6cqw; border-radius: 1.8cqw; background: #fff; box-shadow: -0.9cqw 0 #25f4ee, 0.9cqw 0 #fe2c55; }
+  .ui-top { flex: 68; display: flex; flex-direction: column; }
+  .ui-nav { flex: 83; }
+  .ui-nav::after { content: ""; position: absolute; bottom: 2.5cqw; left: 50%; transform: translateX(-50%); width: 34%; height: 1.2cqw; border-radius: 1cqw; background: rgba(255, 255, 255, 0.9); }  /* home indicator */
+
+  .status { flex: 8; display: flex; justify-content: space-between; align-items: center; padding: 0 7cqw; font-size: 0.75rem; font-size: 3.8cqw; }
+  .status .right { display: flex; align-items: center; gap: 1.6cqw; }
+  .batt { position: relative; width: 6.6cqw; height: 3cqw; border: 0.35cqw solid rgba(255, 255, 255, 0.6); border-radius: 0.9cqw; }
+  .batt::after { content: ""; position: absolute; inset: 0.35cqw; border-radius: 0.4cqw; background: #fff; }
+  .tabs { flex: 10; display: flex; justify-content: center; align-items: center; gap: 6cqw; font-size: 1rem; font-size: 5.2cqw; color: rgba(255, 255, 255, 0.6); }
+  .tabs .on { color: #fff; border-bottom: 0.5cqw solid #fff; padding: 0.6cqw 0; }
+
+  .ui-nav .row { height: 13.5cqw; display: flex; justify-content: space-between; align-items: center; padding: 0 5cqw; font-size: 0.85rem; font-size: 4.3cqw; color: rgba(255, 255, 255, 0.6); }
+  .ui-nav .row .on { color: #fff; }
+  .ui-nav .plus { width: 11.5cqw; height: 7.6cqw; border-radius: 2cqw; background: #fff; box-shadow: -1cqw 0 #25f4ee, 1cqw 0 #fe2c55; }
 
   /* Block type: photo collage (6 x 6 grid, no gaps) */
   .collage { height: var(--collage-h); display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(6, 1fr); }
@@ -103,19 +112,28 @@
   <!-- 3. Three phones block -->
   <section class="block phones">
     <div class="phone">
-      <div class="ui-top"><span>Following</span><span class="on">For You</span></div>
+      <div class="ui-top">
+        <div class="status"><span>9:41</span><span class="right"><span>5G</span><i class="batt"></i></span></div>
+        <div class="tabs"><span>Following</span><span class="on">For You</span></div>
+      </div>
       <video muted loop playsinline preload="metadata" src="videos/content/b3-1.mp4"></video>
-      <nav class="ui-nav"><span>Home</span><span>Friends</span><span class="plus"></span><span>Inbox</span><span>Me</span></nav>
+      <nav class="ui-nav"><div class="row"><span class="on">Home</span><span>Friends</span><span class="plus"></span><span>Inbox</span><span>Profile</span></div></nav>
     </div>
     <div class="phone">
-      <div class="ui-top"><span>Following</span><span class="on">For You</span></div>
+      <div class="ui-top">
+        <div class="status"><span>9:41</span><span class="right"><span>5G</span><i class="batt"></i></span></div>
+        <div class="tabs"><span>Following</span><span class="on">For You</span></div>
+      </div>
       <video muted loop playsinline preload="metadata" src="videos/content/b3-2.mp4"></video>
-      <nav class="ui-nav"><span>Home</span><span>Friends</span><span class="plus"></span><span>Inbox</span><span>Me</span></nav>
+      <nav class="ui-nav"><div class="row"><span class="on">Home</span><span>Friends</span><span class="plus"></span><span>Inbox</span><span>Profile</span></div></nav>
     </div>
     <div class="phone">
-      <div class="ui-top"><span>Following</span><span class="on">For You</span></div>
+      <div class="ui-top">
+        <div class="status"><span>9:41</span><span class="right"><span>5G</span><i class="batt"></i></span></div>
+        <div class="tabs"><span>Following</span><span class="on">For You</span></div>
+      </div>
       <video muted loop playsinline preload="metadata" src="videos/content/b3-3.mp4"></video>
-      <nav class="ui-nav"><span>Home</span><span>Friends</span><span class="plus"></span><span>Inbox</span><span>Me</span></nav>
+      <nav class="ui-nav"><div class="row"><span class="on">Home</span><span>Friends</span><span class="plus"></span><span>Inbox</span><span>Profile</span></div></nav>
     </div>
   </section>
 
