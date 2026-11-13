@@ -7,7 +7,7 @@
 <style>
   /* ---------- SETTINGS: edit these ---------- */
   :root {
-    --video-brightness: 0.8;   /* 1 = original, lower = darker */
+    --video-brightness: 0.8;    /* 1 = original, lower = darker */
     --button-font-size: 1.5rem;
     --button-color: #ffffff;
     --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -43,6 +43,14 @@
     height: 100%;
     object-fit: cover;               /* crops to fill the whole half */
     filter: brightness(var(--video-brightness));
+  }
+
+  /* Hide native play-button overlays (Safari/Chrome) */
+  .half video::-webkit-media-controls,
+  .half video::-webkit-media-controls-start-playback-button,
+  .half video::-webkit-media-controls-overlay-play-button {
+    display: none !important;
+    -webkit-appearance: none;
   }
 
   .half a {
@@ -93,5 +101,52 @@
     </section>
 
   </main>
+
+  <script>
+    const videos = document.querySelectorAll('.half video');
+
+    // Safari wants these set as attributes AND properties
+    videos.forEach(v => {
+      v.setAttribute('muted', '');
+      v.setAttribute('playsinline', '');
+      v.setAttribute('webkit-playsinline', '');
+      v.setAttribute('disablepictureinpicture', '');
+      v.muted = true;
+      v.defaultMuted = true;
+      v.controls = false;
+    });
+
+    function tryPlay(v) {
+      if (!v.paused) return;
+      v.muted = true;
+      const p = v.play();
+      if (p && p.catch) p.catch(() => {});
+    }
+
+    function startAll() { videos.forEach(tryPlay); }
+
+    // Try as early and as often as possible
+    startAll();
+    videos.forEach(v => {
+      ['loadedmetadata', 'loadeddata', 'canplay'].forEach(evt =>
+        v.addEventListener(evt, () => tryPlay(v))
+      );
+    });
+    window.addEventListener('load', startAll);
+    window.addEventListener('pageshow', startAll);
+    document.addEventListener('visibilitychange', startAll);
+
+    // Keep retrying briefly in case Safari is slow to allow it
+    let tries = 0;
+    const retry = setInterval(() => {
+      startAll();
+      if (++tries > 20 || [...videos].every(v => !v.paused)) clearInterval(retry);
+    }, 500);
+
+    // Last resort: first click, tap or key press anywhere starts both
+    ['click', 'keydown', 'touchstart', 'pointerdown', 'scroll', 'mousemove'].forEach(evt =>
+      document.addEventListener(evt, startAll, { once: true, passive: true })
+    );
+  </script>
 </body>
 </html>
