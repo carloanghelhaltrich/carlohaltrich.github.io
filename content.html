@@ -50,8 +50,11 @@
   /* Block type: three phones */
   .phones { display: flex; align-items: center; justify-content: center; gap: var(--phone-gap); background: var(--phones-bg); }
   .phone {
-    position: relative; height: 78%; aspect-ratio: 9 / 19.5;
-    border: 0.7rem solid #08090c; border-radius: 2.6rem; overflow: hidden;
+    --phone-h: calc(var(--block-h) * 0.78);   /* total phone height */
+    --phone-b: 0.7rem;                        /* bezel thickness */
+    position: relative; height: var(--phone-h);
+    width: calc((var(--phone-h) - 2 * var(--phone-b)) * 9 / 16 + 2 * var(--phone-b)); /* screen is exactly 9:16 */
+    border: var(--phone-b) solid #08090c; border-radius: 2.6rem; overflow: hidden;
     background: #08090c; box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.45);
   }
   .phone::before {   /* notch */
