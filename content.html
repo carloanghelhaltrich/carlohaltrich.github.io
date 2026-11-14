@@ -50,8 +50,11 @@
   /* Block type: three phones */
   .phones { display: flex; align-items: center; justify-content: center; gap: var(--phone-gap); background: var(--phones-bg); }
   .phone {
-    position: relative; height: calc(var(--block-h) * 0.78); aspect-ratio: 9 / 19.5;  /* real iPhone proportions */
-    border: 0.7rem solid #08090c; border-radius: 2.6rem; overflow: hidden;
+    --phone-h: calc(var(--block-h) * 0.78);   /* total phone height */
+    --phone-b: 0.7rem;                        /* bezel thickness */
+    position: relative; height: var(--phone-h);
+    width: calc((var(--phone-h) - 2 * var(--phone-b)) / 1.99 + 2 * var(--phone-b));  /* screen = 9:16 video + bottom bar */
+    border: var(--phone-b) solid #08090c; border-radius: 2.6rem; overflow: hidden;
     background: #08090c; box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.45);
     container-type: inline-size;   /* bar text scales with the phone size */
     display: flex; flex-direction: column;   /* top bar, video, bottom bar */
@@ -61,20 +64,18 @@
     width: 28%; height: 1.1rem; border-radius: 1rem; background: #08090c; z-index: 3;
   }
 
-  /* TikTok-style proportions: top bar ~8% and bottom bar ~10% of the screen, video exactly 9:16 in between */
+  /* TikTok-style: video is exactly 9:16, status bar and tabs sit on top of it, nav bar fills the rest */
   .phone video { flex: none; width: 100%; height: auto; aspect-ratio: 9 / 16; }
-  .ui-top, .ui-nav { position: relative; z-index: 2; background: #0d0e12; color: #fff; font-weight: 600; }
-  .ui-top { flex: 68; display: flex; flex-direction: column; }
-  .ui-nav { flex: 83; }
-  .ui-nav::after { content: ""; position: absolute; bottom: 2.5cqw; left: 50%; transform: translateX(-50%); width: 34%; height: 1.2cqw; border-radius: 1cqw; background: rgba(255, 255, 255, 0.9); }  /* home indicator */
-
-  .status { flex: 8; display: flex; justify-content: space-between; align-items: center; padding: 0 7cqw; font-size: 0.75rem; font-size: 3.8cqw; }
+  .ui-top { position: absolute; top: 0; left: 0; right: 0; z-index: 2; color: #fff; font-weight: 600; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55); background: linear-gradient(rgba(0, 0, 0, 0.35), transparent); padding-bottom: 6cqw; pointer-events: none; }
+  .status { height: 8.5cqw; display: flex; justify-content: space-between; align-items: center; padding: 0 8cqw; font-size: 0.75rem; font-size: 3.8cqw; }
   .status .right { display: flex; align-items: center; gap: 1.6cqw; }
-  .batt { position: relative; width: 6.6cqw; height: 3cqw; border: 0.35cqw solid rgba(255, 255, 255, 0.6); border-radius: 0.9cqw; }
+  .batt { position: relative; width: 6.6cqw; height: 3cqw; border: 0.35cqw solid rgba(255, 255, 255, 0.7); border-radius: 0.9cqw; }
   .batt::after { content: ""; position: absolute; inset: 0.35cqw; border-radius: 0.4cqw; background: #fff; }
-  .tabs { flex: 10; display: flex; justify-content: center; align-items: center; gap: 6cqw; font-size: 1rem; font-size: 5.2cqw; color: rgba(255, 255, 255, 0.6); }
+  .tabs { height: 10cqw; display: flex; justify-content: center; align-items: center; gap: 6cqw; font-size: 1rem; font-size: 5.2cqw; color: rgba(255, 255, 255, 0.65); }
   .tabs .on { color: #fff; border-bottom: 0.5cqw solid #fff; padding: 0.6cqw 0; }
 
+  .ui-nav { position: relative; z-index: 2; flex: 1; background: #0d0e12; color: #fff; font-weight: 600; }
+  .ui-nav::after { content: ""; position: absolute; bottom: 2.5cqw; left: 50%; transform: translateX(-50%); width: 34%; height: 1.2cqw; border-radius: 1cqw; background: rgba(255, 255, 255, 0.9); }  /* home indicator */
   .ui-nav .row { height: 13.5cqw; display: flex; justify-content: space-between; align-items: center; padding: 0 5cqw; font-size: 0.85rem; font-size: 4.3cqw; color: rgba(255, 255, 255, 0.6); }
   .ui-nav .row .on { color: #fff; }
   .ui-nav .plus { width: 11.5cqw; height: 7.6cqw; border-radius: 2cqw; background: #fff; box-shadow: -1cqw 0 #25f4ee, 1cqw 0 #fe2c55; }
