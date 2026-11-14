@@ -40,8 +40,24 @@
 
   .lightbox { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.9); }
   .lightbox[hidden] { display: none; }
-  .lb-frame { width: min(90vw, calc(85vh * 16 / 9)); aspect-ratio: 16 / 9; background: #000; }
+  .lb-frame { position: relative; width: min(90vw, calc(85vh * 16 / 9)); aspect-ratio: 16 / 9; background: #000; }
   .lb-frame iframe { width: 100%; height: 100%; border: 0; }
+  .lightbox:focus { outline: none; }
+
+  /* Custom controls (shown for YouTube links; the shield stops YouTube's own overlays from appearing on hover) */
+  .lb-shield { position: absolute; inset: 0; z-index: 1; display: none; cursor: pointer; }
+  .lb-controls {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: none; align-items: center; gap: 0.9rem;
+    padding: 2.5rem 1.1rem 0.9rem; background: linear-gradient(transparent, rgba(0, 0, 0, 0.75)); color: #fff; font-size: 0.85rem;
+  }
+  .lightbox.custom .lb-shield { display: block; }
+  .lightbox.custom .lb-controls { display: flex; }
+  .lb-controls button { display: flex; padding: 0.25rem; border: 0; background: none; color: #fff; cursor: pointer; }
+  .lb-controls button:hover { opacity: 0.75; }
+  .lb-controls svg { width: 1.5rem; height: 1.5rem; fill: currentColor; }
+  .lb-controls span { font-variant-numeric: tabular-nums; }
+  .lb-seek { flex: 1; height: 0.3rem; accent-color: #fff; cursor: pointer; }
+  .lb-msg { opacity: 0.85; }
   .lb-close { position: absolute; top: 1rem; right: 1.75rem; border: 0; background: none; color: #fff; font-size: 2.75rem; line-height: 1; cursor: pointer; }
   .lb-close:hover { opacity: 0.7; }
 
@@ -113,11 +129,11 @@
   <section class="block split">
     <div>
       <video muted loop playsinline preload="metadata" src="videos/content/b1-left.mp4"></video>
-      <button class="vid-btn" data-video="https://youtu.be/PVEKlhxWbfU">Swytch Bike</button>
+      <button class="vid-btn" data-video="https://www.youtube.com/watch?v=VIDEO_ID">project one</button>
     </div>
     <div>
       <video muted loop playsinline preload="metadata" src="videos/content/b1-right.mp4"></video>
-      <button class="vid-btn" data-video="https://vimeo.com/VIDEO_ID">TentBox</button>
+      <button class="vid-btn" data-video="https://www.youtube.com/watch?v=VIDEO_ID">project two</button>
     </div>
   </section>
 
@@ -193,9 +209,21 @@
   </section>
 
   <!-- Video lightbox (shared by every .vid-btn) -->
-  <div class="lightbox" id="lightbox" hidden>
+  <div class="lightbox" id="lightbox" tabindex="-1" hidden>
     <button class="lb-close" aria-label="Close">&times;</button>
-    <div class="lb-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
+    <div class="lb-frame">
+      <div id="yt-slot"></div>
+      <div class="lb-shield"></div>
+      <div class="lb-controls">
+        <button class="lb-play" aria-label="Play or pause"></button>
+        <span class="lb-cur">0:00</span>
+        <input class="lb-seek" type="range" min="0" max="100" step="0.1" value="0" aria-label="Seek">
+        <span class="lb-dur">0:00</span>
+        <button class="lb-mute" aria-label="Mute or unmute"></button>
+        <span class="lb-msg"></span>
+        <button class="lb-share" aria-label="Copy link"></button>
+      </div>
+    </div>
   </div>
 
   <script src="site.js"></script>
@@ -236,22 +264,41 @@
       document.addEventListener(evt, () => videos.forEach(update), { once: true, passive: true })
     );
 
-    // Lightbox: turns a normal YouTube or Vimeo link into an embed and plays it with sound
+    // Lightbox: YouTube links get custom controls (play/pause, seek bar, mute, share); other links (e.g. Vimeo) use their own player
     const lb = document.getElementById('lightbox');
-    const frame = lb.querySelector('iframe');
+    const frameBox = lb.querySelector('.lb-frame');
+    const el = {
+      play: lb.querySelector('.lb-play'), seek: lb.querySelector('.lb-seek'),
+      cur: lb.querySelector('.lb-cur'), dur: lb.querySelector('.lb-dur'),
+      mute: lb.querySelector('.lb-mute'), share: lb.querySelector('.lb-share'),
+      msg: lb.querySelector('.lb-msg'), shield: lb.querySelector('.lb-shield')
+    };
+    const ICON = {
+      play: '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
+      pause: '<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>',
+      vol: '<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>',
+      muted: '<svg viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>',
+      share: '<svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>'
+    };
 
-    function toEmbed(link) {
+    let player = null, ready = false, timer = null, apiPromise = null, shareLink = '', msgTimer = null;
+
+    function parseYouTube(link) {
+      try {
+        const u = new URL(link), h = u.hostname.replace('www.', '');
+        if (h === 'youtu.be') return u.pathname.slice(1) || null;
+        if (h.endsWith('youtube.com')) {
+          const p = u.pathname.split('/');
+          return (p[1] === 'embed' || p[1] === 'shorts') ? (p[2] || null) : u.searchParams.get('v');
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function toEmbed(link) {   // Vimeo falls back to its own player; anything else is embedded as given
       try {
         const u = new URL(link);
-        const h = u.hostname.replace('www.', '');
-        let id = null;
-        if (h === 'youtu.be') id = u.pathname.slice(1);
-        else if (h.endsWith('youtube.com')) {
-          const parts = u.pathname.split('/');
-          id = (parts[1] === 'embed' || parts[1] === 'shorts') ? parts[2] : u.searchParams.get('v');
-        }
-        if (id) return 'https://www.youtube.com/embed/' + id + '?autoplay=1&rel=0';
-        if (h.endsWith('vimeo.com')) {
+        if (u.hostname.replace('www.', '').endsWith('vimeo.com')) {
           const m = u.pathname.match(/(\d+)(?:\/(\w+))?/);
           if (m) return 'https://player.vimeo.com/video/' + m[1] + '?autoplay=1' + (m[2] ? '&h=' + m[2] : '');
         }
@@ -259,22 +306,124 @@
       return link;
     }
 
-    function openLightbox(link) {
-      frame.src = toEmbed(link);
+    function loadApi() {
+      if (apiPromise) return apiPromise;
+      apiPromise = new Promise(resolve => {
+        if (window.YT && YT.Player) return resolve();
+        window.onYouTubeIframeAPIReady = resolve;
+        const t = document.createElement('script');
+        t.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(t);
+      });
+      return apiPromise;
+    }
+
+    const fmt = t => { t = Math.floor(t || 0); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
+
+    function tick() {
+      if (!player || !ready) return;
+      const d = player.getDuration() || 0, c = player.getCurrentTime() || 0;
+      el.seek.max = d; el.seek.value = c;
+      el.cur.textContent = fmt(c); el.dur.textContent = fmt(d);
+    }
+    function syncIcons() {
+      const playing = ready && player.getPlayerState() === 1;
+      el.play.innerHTML = playing ? ICON.pause : ICON.play;
+      el.mute.innerHTML = (ready && player.isMuted()) ? ICON.muted : ICON.vol;
+    }
+    function togglePlay() {
+      if (!ready) return;
+      if (player.getPlayerState() === 1) player.pauseVideo(); else player.playVideo();
+    }
+    function toggleMute() {
+      if (!ready) return;
+      if (player.isMuted()) player.unMute(); else player.mute();
+      syncIcons();
+    }
+    function flash(text) {
+      el.msg.textContent = text;
+      clearTimeout(msgTimer);
+      msgTimer = setTimeout(() => { el.msg.textContent = ''; }, 1800);
+    }
+
+    async function openLightbox(link) {
+      const id = parseYouTube(link);
       lb.hidden = false;
       document.body.style.overflow = 'hidden';
-      lb.querySelector('.lb-close').focus();
+      lb.focus();
+
+      frameBox.querySelectorAll('#yt-slot, iframe').forEach(n => n.remove());
+      const slot = document.createElement('div');
+      slot.id = 'yt-slot';
+      frameBox.prepend(slot);
+
+      if (!id) {   // not YouTube: use the host's own player and controls
+        lb.classList.remove('custom');
+        const f = document.createElement('iframe');
+        f.allow = 'autoplay; fullscreen; picture-in-picture';
+        f.allowFullscreen = true;
+        f.src = toEmbed(link);
+        slot.appendChild(f);
+        return;
+      }
+
+      lb.classList.add('custom');
+      shareLink = 'https://youtu.be/' + id;
+      ready = false;
+      el.seek.value = 0; el.cur.textContent = '0:00'; el.dur.textContent = '0:00';
+      syncIcons();
+
+      await loadApi();
+      if (lb.hidden) return;   // closed while the API was loading
+      player = new YT.Player('yt-slot', {
+        videoId: id,
+        playerVars: { autoplay: 1, controls: 0, rel: 0, iv_load_policy: 3, playsinline: 1, disablekb: 1, fs: 0, enablejsapi: 1 },
+        events: {
+          onReady: e => { ready = true; e.target.playVideo(); syncIcons(); tick(); },
+          onStateChange: () => { syncIcons(); tick(); }
+        }
+      });
+      timer = setInterval(tick, 250);
     }
+
     function closeLightbox() {
       lb.hidden = true;
-      frame.src = 'about:blank';      // stops the video
+      clearInterval(timer);
+      ready = false;
+      if (player) { try { player.destroy(); } catch (e) {} player = null; }
+      frameBox.querySelectorAll('#yt-slot, iframe').forEach(n => n.remove());
+      lb.classList.remove('custom');
       document.body.style.overflow = '';
     }
+
+    el.share.innerHTML = ICON.share;
+    syncIcons();
+    el.play.addEventListener('click', togglePlay);
+    el.shield.addEventListener('click', togglePlay);
+    el.mute.addEventListener('click', toggleMute);
+    el.seek.addEventListener('input', () => {
+      if (!ready) return;
+      player.seekTo(parseFloat(el.seek.value), true);
+      el.cur.textContent = fmt(el.seek.value);
+    });
+    el.share.addEventListener('click', () => {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareLink).then(() => flash('Link copied'), () => window.prompt('Copy this link', shareLink));
+      } else window.prompt('Copy this link', shareLink);
+    });
+
     document.querySelectorAll('.vid-btn').forEach(b =>
       b.addEventListener('click', () => openLightbox(b.dataset.video)));
     lb.querySelector('.lb-close').addEventListener('click', closeLightbox);
     lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !lb.hidden) closeLightbox(); });
+    document.addEventListener('keydown', e => {
+      if (lb.hidden) return;
+      if (e.key === 'Escape') closeLightbox();
+      else if (lb.classList.contains('custom') && !['BUTTON', 'INPUT'].includes(document.activeElement.tagName)) {
+        if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+        else if (e.key === 'm' || e.key === 'M') toggleMute();
+      }
+    });
   </script>
 </body>
 </html>
